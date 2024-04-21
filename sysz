@@ -15,7 +15,7 @@ _sysz_keys() {
   cat <<EOF
 Keybindings:
   TAB           Toggle selection.
-  ctrl-v        'cat' the unit in the preview window.
+  ctrl-v        Toggle 'cat' the unit in the preview window.
   ctrl-s        Select states to match. Selection is reset.
   ctrl-r        Run daemon-reload. Selection is reset.
   ctrl-p        History previous.
@@ -422,7 +422,10 @@ while :; do
       --prompt="Units: " \
       --header '? for keybindings' \
       --bind "?:preview(echo '$(_sysz_keys)')" \
-      --bind "ctrl-v:preview('${BASH_SOURCE[0]}' _fzf_cat {})" \
+      --bind 'ctrl-v:transform:[[ ! $FZF_PROMPT =~ CAT ]] &&
+              echo "change-prompt(CAT )+preview('${BASH_SOURCE[0]}' _fzf_cat {})" ||
+              echo "change-prompt(Units: )+preview('${BASH_SOURCE[0]}' _fzf_preview {})"' \
+      --bind 'focus:change-prompt(Units: )' \
       --preview="'${BASH_SOURCE[0]}' _fzf_preview {}" \
       --preview-window=70% |
     readarray -t PICKS

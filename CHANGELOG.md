@@ -5,6 +5,30 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+Maintenance of this project continues in [Esl1h/sysz](https://github.com/Esl1h/sysz).
+
+### Added
+
+- `ctrl-v` toggles the `cat` preview instead of only switching to it,
+  by [@greyHairChooseLife](https://github.com/greyHairChooseLife) (joehillen/sysz#31)
+
+### Changed
+
+- `--help` writes to stdout instead of stderr, so its output can be piped,
+  by [@tkna91](https://github.com/tkna91) (joehillen/sysz#29)
+- Require fzf >= 0.46.0, the first release that exports `$FZF_PROMPT`
+
+### Fixed
+
+- `journalctl` uses `--user-unit` for user session units (joehillen/sysz#34)
+- `r` and `stat` command aliases now work as the help always claimed
+- `mask`, `unmask`, `show`, `journal` and `follow` are documented in the help
+- Quote the script path in the `ctrl-v` binding so installs under a path
+  with spaces keep a working preview
+- Keep the Console badge in the README generator so it survives regeneration
+
 ## [1.4.3] - 2021-10-11
 
 ### Fixed

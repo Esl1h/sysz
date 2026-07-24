@@ -1,6 +1,11 @@
 name: test
 on: [push, pull_request, workflow_dispatch]
 
+# Nothing here writes to the repository. Declared explicitly so the
+# default, which is wider, is not what these jobs get.
+permissions:
+  contents: read
+
 jobs:
   bats:
     runs-on: ubuntu-latest

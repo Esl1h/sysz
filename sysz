@@ -311,10 +311,10 @@ while [[ -n $1 ]]; do
     _sysz_help
     ;;
   # Handle short names
-  re)
+  r | re)
     CMD=restart
     ;;
-  s)
+  s | stat)
     CMD=status
     ;;
   ed)

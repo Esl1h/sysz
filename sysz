@@ -170,34 +170,30 @@ _sysz_show() {
 }
 
 _sysz_sort() {
-  local str
-  local mgr
-  local unit
-  local n
-  while IFS= read -r str; do
-    mgr=${str%% *}
-    unit_colored=${str##* }
-    unit=${unit_colored//$'\e'[\[(]*([0-9;])[@-n]/}
+  # Build a sort key of "<rank><type><unit without dashes>" ahead of the
+  # payload, sort on it, then drop it again.
+  awk '
+    {
+      mgr = $1
+      unit_colored = $NF
+      unit = unit_colored
+      gsub(/\033[\[(][0-9;]*[@-n]/, "", unit)
 
-    if [[ $unit =~ \.service$ ]]; then
-      n=0
-      [[ $mgr = "[system]" ]] && n=1
-    elif [[ $unit =~ \.timer$ ]]; then
-      n=2
-      [[ $mgr = "[system]" ]] && n=3
-    elif [[ $unit =~ \.socket$ ]]; then
-      n=4
-      [[ $mgr = "[system]" ]] && n=5
-    elif [[ $mgr = "[user]" ]]; then
-      n=6
-    else
+      if (unit ~ /\.service$/)     n = (mgr == "[system]") ? 1 : 0
+      else if (unit ~ /\.timer$/)  n = (mgr == "[system]") ? 3 : 2
+      else if (unit ~ /\.socket$/) n = (mgr == "[system]") ? 5 : 4
+      else if (mgr == "[user]")    n = 6
       # then the rest based on file extension
-      n=7
-    fi
-    type=${unit##*.}
-    unit_undashed=${unit//-/}
-    echo "$n$type$unit_undashed $mgr $unit_colored"
-  done | sort -bifu | cut -d' ' -f2-
+      else                         n = 7
+
+      type = unit
+      sub(/^.*\./, "", type)
+      undashed = unit
+      gsub(/-/, "", undashed)
+
+      print n type undashed, mgr, unit_colored
+    }
+  ' | sort -bifu | cut -d' ' -f2-
 }
 
 _sysz_list() {

@@ -608,7 +608,11 @@ for PICK in "${UNITS[@]}"; do
       _sysz_systemctl "$MANAGER" $CMD "${ARGS[@]}" -- "$UNIT" || CODE=$?
       SYSTEMD_COLORS=1 systemctl "$MANAGER" status --no-pager -- "$UNIT"
       if [[ ${#UNITS[@]} -eq 1 ]]; then
-        exit $CODE
+        # CODE is only assigned when the command failed. Quoting it without
+        # a default would make bash reject the empty string and exit 2, and
+        # leaving it bare only works by accident, because the status of the
+        # test above happens to be the one a bare exit would report.
+        exit "${CODE:-0}"
       fi
       ;;
     esac

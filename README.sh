@@ -24,6 +24,8 @@ VERSION: $(cat VERSION)
 - See and filter both system and user units simultaneously.
 - Supports all unit types.
 - Opens right away: loaded units are shown first and the rest stream in.
+- Keys are listed in the header, and the layout adapts to the terminal
+  width so nothing is cut off over a narrow ssh session.
 - Units ordered by service, timer, socket, and the rest.
 - Runs \`sudo\` automatically and only if necessary.
 - Filter units by state using \`ctrl-s\` or the \`--state\` option.

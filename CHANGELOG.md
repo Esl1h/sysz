@@ -31,6 +31,11 @@ Maintenance of this project continues in [Esl1h/sysz](https://github.com/Esl1h/s
 
 ### Changed
 
+- The header lists the keys that matter instead of only pointing at `?`.
+  It is chosen to fit the room the layout leaves it, so it is never cut off
+- The preview no longer always takes 70% of the width. Below 160 columns it
+  takes 60%, and below 100 columns 50%, so unit names stay readable over a
+  standard 80 column ssh session
 - Units are ordered loaded first and never-loaded after, each group sorted
   as before. Previously there was a single global ordering, which was only
   possible because nothing was shown until every unit was known.

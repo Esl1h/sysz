@@ -1,6 +1,11 @@
 #!/bin/bash
 BLOCK='```'
 
+# $XDG_CACHE_HOME is meant to reach the README as those literal
+# characters, so the home directory of whoever generated it does not.
+# shellcheck disable=SC2016
+USAGE=$(./sysz -h | sed -e 's:/home/[a-z]\+/.cache:$XDG_CACHE_HOME:')
+
 cat <<EOF >README.md
 # [sysz](https://github.com/Esl1h/sysz)
 
@@ -84,7 +89,7 @@ ${BLOCK}
 # Usage
 
 ${BLOCK}text
-$(./sysz -h | sed -e 's:/home/[a-z]\+/.cache:$XDG_CACHE_HOME:')
+$USAGE
 ${BLOCK}
 
 # Acknowledgements

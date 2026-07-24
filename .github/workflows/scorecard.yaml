@@ -1,0 +1,45 @@
+name: scorecard
+
+# CodeQL has no analyser for shell, so there is nothing for it to say about
+# this repository. Scorecard checks the things that do apply to a project
+# like this one: whether actions are pinned, whether the branch is
+# protected, whether releases are built by CI. Its findings show up under
+# Security, next to the policy.
+
+on:
+  branch_protection_rule:
+  schedule:
+    - cron: "27 6 * * 1"
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions: read-all
+
+jobs:
+  analysis:
+    runs-on: ubuntu-latest
+    permissions:
+      # Needed to upload the result to the code scanning dashboard.
+      security-events: write
+      # Needed by the publish step to prove where the result came from.
+      id-token: write
+      contents: read
+      actions: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          persist-credentials: false
+
+      - name: Run analysis
+        uses: ossf/scorecard-action@2d1146689b8cda280b9bc96326124645441f03bc # v2.4.4
+        with:
+          results_file: results.sarif
+          results_format: sarif
+          publish_results: true
+
+      - name: Upload to code scanning
+        uses: github/codeql-action/upload-sarif@4187e74d05793876e9989daffde9c3e66b4acd07 # v3
+        with:
+          sarif_file: results.sarif

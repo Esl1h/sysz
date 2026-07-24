@@ -20,9 +20,25 @@ Maintenance of this project continues in [Esl1h/sysz](https://github.com/Esl1h/s
   by [@tkna91](https://github.com/tkna91) (joehillen/sysz#29)
 - Require fzf >= 0.46.0, the first release that exports `$FZF_PROMPT`
 
+### Performance
+
+- The picker opens as soon as the loaded units are ready, in 138ms instead
+  of 1.6s on a host with ~1300 units. Units that have a unit file but are
+  not loaded stream in afterwards, and the header says so while they do
+  (joehillen/sysz#33)
+- `_sysz_sort` and the state colouring are done in awk rather than in bash
+  while-read loops, cutting CPU time roughly threefold
+
+### Changed
+
+- Units are ordered loaded first and never-loaded after, each group sorted
+  as before. Previously there was a single global ordering, which was only
+  possible because nothing was shown until every unit was known.
+
 ### Fixed
 
 - `journalctl` uses `--user-unit` for user session units (joehillen/sysz#34)
+- Closing the picker no longer prints broken pipe errors from `sort`
 - `r` and `stat` command aliases now work as the help always claimed
 - `mask`, `unmask`, `show`, `journal` and `follow` are documented in the help
 - Quote the script path in the `ctrl-v` binding so installs under a path

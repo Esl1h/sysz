@@ -14,6 +14,7 @@ VERSION: 1.4.3
 
 - See and filter both system and user units simultaneously.
 - Supports all unit types.
+- Opens right away: loaded units are shown first and the rest stream in.
 - Units ordered by service, timer, socket, and the rest.
 - Runs `sudo` automatically and only if necessary.
 - Filter units by state using `ctrl-s` or the `--state` option.

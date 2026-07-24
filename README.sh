@@ -83,7 +83,7 @@ ${BLOCK}
 # Usage
 
 ${BLOCK}text
-$(./sysz -h 2>&1 | sed -e 's:/home/[a-z]\+/.cache:$XDG_CACHE_HOME:')
+$(./sysz -h | sed -e 's:/home/[a-z]\+/.cache:$XDG_CACHE_HOME:')
 ${BLOCK}
 
 # Acknowledgements

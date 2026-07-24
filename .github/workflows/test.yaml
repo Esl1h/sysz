@@ -18,24 +18,45 @@ jobs:
       - name: Install bats
         run: sudo apt-get update && sudo apt-get install -y bats
 
-      - name: Install fzf ${{ matrix.fzf }}
+      - name: Resolve the fzf tag
+        id: fzf
         run: |
           set -euo pipefail
-          # A single 504 from github.com has already failed this job once,
-          # so every request here retries.
-          curl() { command curl --retry 3 --retry-delay 2 --retry-all-errors "$@"; }
+          curl() { command curl --retry 5 --retry-delay 3 --retry-all-errors "$@"; }
           tag='${{ matrix.fzf }}'
           if [ "$tag" = latest ]; then
             tag=$(curl -fsSL https://api.github.com/repos/junegunn/fzf/releases/latest |
               sed -n 's/.*"tag_name": *"\([^"]*\)".*/\1/p')
           fi
+          echo "tag=$tag" >>"$GITHUB_OUTPUT"
+
+      - name: Restore fzf from cache
+        id: cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.local/bin/fzf
+          key: fzf-${{ steps.fzf.outputs.tag }}
+
+      # Release downloads have returned 504 often enough to fail builds that
+      # had nothing wrong with them, so this retries and, once it succeeds,
+      # the cache above keeps it from being needed again.
+      - name: Download fzf ${{ steps.fzf.outputs.tag }}
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: |
+          set -euo pipefail
+          curl() { command curl --retry 5 --retry-delay 3 --retry-all-errors "$@"; }
+          tag='${{ steps.fzf.outputs.tag }}'
           # Older tags carry no "v" prefix, newer ones do. The asset name
           # never does.
-          version=${tag#v}
-          curl -fsSL -o fzf.tar.gz "https://github.com/junegunn/fzf/releases/download/${tag}/fzf-${version}-linux_amd64.tar.gz"
-          sudo tar xzf fzf.tar.gz -C /usr/local/bin
+          curl -fsSL -o fzf.tar.gz "https://github.com/junegunn/fzf/releases/download/${tag}/fzf-${tag#v}-linux_amd64.tar.gz"
+          mkdir -p ~/.local/bin
+          tar xzf fzf.tar.gz -C ~/.local/bin
           rm fzf.tar.gz
-          fzf --version
+
+      - name: Put fzf on PATH
+        run: |
+          echo "$HOME/.local/bin" >>"$GITHUB_PATH"
+          "$HOME/.local/bin/fzf" --version
 
       - name: Run tests
         run: bats test/

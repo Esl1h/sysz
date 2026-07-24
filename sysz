@@ -193,7 +193,11 @@ _sysz_sort() {
 
       print n type undashed, mgr, unit_colored
     }
-  ' | sort -bifu | cut -d' ' -f2-
+  ' | {
+    # Quitting the picker closes this pipe mid-write, and sort and cut
+    # report that as an error. There is nothing left to say it to.
+    sort -bifu | cut -d' ' -f2-
+  } 2>/dev/null
 }
 
 _sysz_list() {

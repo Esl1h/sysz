@@ -20,13 +20,23 @@ jobs:
           shellcheck --version
           shfmt --version
 
+      # "shfmt -f" finds shell files by extension and shebang, so a script
+      # added later is picked up without anyone remembering to edit this.
       - name: shellcheck
         # SC2294 is the eval in _sysz_run, which is how every systemctl call
         # is dispatched. It predates this fork and is not a drive-by fix.
-        run: shellcheck -e SC2294 sysz README.sh test/*.bats
+        run: |
+          set -euo pipefail
+          mapfile -t files < <(shfmt -f .)
+          printf 'checking %s\n' "${files[@]}"
+          shellcheck -e SC2294 "${files[@]}"
 
       - name: shfmt
         # The .bats files are left out: "@test name {" is not shell syntax,
         # so shfmt cannot parse them. shellcheck above does read them.
         # No flags, so the settings in .editorconfig apply.
-        run: shfmt -d sysz README.sh
+        run: |
+          set -euo pipefail
+          mapfile -t files < <(shfmt -f . | grep -v '\.bats$')
+          printf 'checking %s\n' "${files[@]}"
+          shfmt -d "${files[@]}"

@@ -422,9 +422,9 @@ while :; do
       --prompt="Units: " \
       --header '? for keybindings' \
       --bind "?:preview(echo '$(_sysz_keys)')" \
-      --bind 'ctrl-v:transform:[[ ! $FZF_PROMPT =~ CAT ]] &&
-              echo "change-prompt(CAT )+preview('${BASH_SOURCE[0]}' _fzf_cat {})" ||
-              echo "change-prompt(Units: )+preview('${BASH_SOURCE[0]}' _fzf_preview {})"' \
+      --bind "ctrl-v:transform:[[ ! \$FZF_PROMPT =~ CAT ]] &&
+              echo \"change-prompt(CAT )+preview('${BASH_SOURCE[0]}' _fzf_cat {})\" ||
+              echo \"change-prompt(Units: )+preview('${BASH_SOURCE[0]}' _fzf_preview {})\"" \
       --bind 'focus:change-prompt(Units: )' \
       --preview="'${BASH_SOURCE[0]}' _fzf_preview {}" \
       --preview-window=70% |

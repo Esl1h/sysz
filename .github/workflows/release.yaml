@@ -1,0 +1,63 @@
+name: release
+
+# Pushing a tag publishes the release. The tag carries no "v" prefix, to
+# match the tags this project already has.
+on:
+  push:
+    tags: ["[0-9]+.[0-9]+.[0-9]+"]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Check the tag against VERSION
+        run: |
+          set -euo pipefail
+          tag=${GITHUB_REF_NAME}
+          file=$(cat VERSION)
+          script=$(sed -n 's/^SYSZ_VERSION=//p' sysz)
+          echo "tag=$tag VERSION=$file sysz=$script"
+          [ "$tag" = "$file" ] || { echo "VERSION does not match the tag"; exit 1; }
+          [ "$tag" = "$script" ] || { echo "SYSZ_VERSION does not match the tag"; exit 1; }
+
+      - name: Install bats
+        run: sudo apt-get update && sudo apt-get install -y bats
+
+      - name: Install fzf
+        run: |
+          set -euo pipefail
+          tag=$(curl -fsSL https://api.github.com/repos/junegunn/fzf/releases/latest |
+            sed -n 's/.*"tag_name": *"\([^"]*\)".*/\1/p')
+          curl -fsSL "https://github.com/junegunn/fzf/releases/download/${tag}/fzf-${tag#v}-linux_amd64.tar.gz" |
+            sudo tar xz -C /usr/local/bin
+
+      - name: Run tests
+        run: bats test/
+
+      - name: Extract the changelog entry
+        id: notes
+        run: |
+          set -euo pipefail
+          # Everything under this version's heading, up to the next one.
+          awk -v ver="$GITHUB_REF_NAME" '
+            $0 ~ "^## \\[" ver "\\]" {found = 1; next}
+            found && /^## \[/ {exit}
+            found {print}
+          ' CHANGELOG.md >notes.md
+          if [ ! -s notes.md ]; then
+            echo "no changelog entry for $GITHUB_REF_NAME"
+            exit 1
+          fi
+          cat notes.md
+
+      - name: Publish
+        uses: softprops/action-gh-release@v2
+        with:
+          files: sysz
+          body_path: notes.md

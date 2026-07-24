@@ -14,6 +14,7 @@ declare -a STATES
 _sysz_keys() {
   cat <<EOF
 Keybindings:
+  type          Filter the list. Space separates terms.
   TAB           Toggle selection.
   ctrl-v        Toggle 'cat' the unit in the preview window.
   ctrl-s        Select states to match. Selection is reset.
@@ -21,7 +22,54 @@ Keybindings:
   ctrl-p        History previous.
   ctrl-n        History next.
   ?             Show keybindings.
+  esc, ctrl-c   Quit.
 EOF
+}
+
+# Read from the tty, because stdout here is the pipe feeding fzf.
+_sysz_term_width() {
+  local size
+  size=$(stty size </dev/tty 2>/dev/null) || size='24 80'
+  echo "${size#* }"
+}
+
+# The list and the preview divide the width between them, and both the
+# unit names and the header live in the list half, so one number decides
+# all three. A 70% preview leaves 19 columns on an 80 column terminal,
+# which is not enough to read a unit name, let alone show a hint.
+_sysz_preview_pct() {
+  if (($1 >= 160)); then
+    echo 70
+  elif (($1 >= 100)); then
+    echo 60
+  else
+    echo 50
+  fi
+}
+
+# Pick the longest hint that fits rather than letting fzf truncate one,
+# which is what happened to the first version of this and left the useful
+# half off the screen.
+_sysz_header() {
+  local avail=$1 long medium short
+  long='esc quit  tab select  ^s state  ^r reload  ? help'
+  medium='esc quit  ^s state  ? help'
+  short='^s state  ? help'
+
+  if ((avail >= ${#long})); then
+    printf '%s' "$long"
+  elif ((avail >= ${#medium})); then
+    printf '%s' "$medium"
+  elif ((avail >= ${#short})); then
+    printf '%s' "$short"
+  else
+    printf '%s' '? help'
+  fi
+}
+
+# Columns the header actually gets, matching what fzf leaves for it.
+_sysz_header_width() {
+  echo $(($1 * (100 - $2) / 100 - 5))
 }
 
 _sysz_help() {
@@ -439,6 +487,10 @@ _sysz_states() {
   done
 }
 
+TERM_WIDTH=$(_sysz_term_width)
+PREVIEW_PCT=$(_sysz_preview_pct "$TERM_WIDTH")
+HEADER=$(_sysz_header "$(_sysz_header_width "$TERM_WIDTH" "$PREVIEW_PCT")")
+
 while :; do
   UNITS=()
   KEY=
@@ -457,15 +509,15 @@ while :; do
       --expect=ctrl-r,ctrl-s \
       --history="$SYSZ_HISTORY" \
       --prompt="Units: " \
-      --header 'loading unit files...' \
-      --bind 'load:change-header(? for keybindings)' \
+      --header 'loading...' \
+      --bind "load:change-header($HEADER)" \
       --bind "?:preview(echo '$(_sysz_keys)')" \
       --bind "ctrl-v:transform:[[ ! \$FZF_PROMPT =~ CAT ]] &&
               echo \"change-prompt(CAT )+preview('${BASH_SOURCE[0]}' _fzf_cat {})\" ||
               echo \"change-prompt(Units: )+preview('${BASH_SOURCE[0]}' _fzf_preview {})\"" \
       --bind 'focus:change-prompt(Units: )' \
       --preview="'${BASH_SOURCE[0]}' _fzf_preview {}" \
-      --preview-window=70% |
+      --preview-window="$PREVIEW_PCT%" |
     readarray -t PICKS
 
   KEY=${PICKS[0]}

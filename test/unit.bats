@@ -112,6 +112,60 @@ EOF
   [ -z "$output" ]
 }
 
+# Header and layout
+
+@test "_sysz_preview_pct gives the preview less room on narrow terminals" {
+  [ "$(_sysz_preview_pct 200)" -eq 70 ]
+  [ "$(_sysz_preview_pct 160)" -eq 70 ]
+  [ "$(_sysz_preview_pct 159)" -eq 60 ]
+  [ "$(_sysz_preview_pct 100)" -eq 60 ]
+  [ "$(_sysz_preview_pct 99)" -eq 50 ]
+  [ "$(_sysz_preview_pct 80)" -eq 50 ]
+}
+
+@test "_sysz_header shows more the more room there is" {
+  [[ $(_sysz_header 60) == *'tab select'* ]]
+  [[ $(_sysz_header 30) == 'esc quit'* ]]
+  [[ $(_sysz_header 20) == '^s state'* ]]
+  [ "$(_sysz_header 8)" = '? help' ]
+}
+
+@test "_sysz_header always mentions how to reach the full list of keys" {
+  local w
+  for w in 4 8 16 20 26 40 49 60 200; do
+    [[ $(_sysz_header "$w") == *'? help'* ]] || {
+      echo "no help hint at width $w: $(_sysz_header "$w")"
+      return 1
+    }
+  done
+}
+
+# The first version of the header was cut off by fzf, which dropped the
+# part that mattered. Whatever is returned has to fit.
+@test "_sysz_header never returns more than it was given room for" {
+  local w out
+  for w in 8 12 16 20 25 26 30 35 43 48 49 55 80 200; do
+    out=$(_sysz_header "$w")
+    [ "${#out}" -le "$w" ] || {
+      echo "width $w got ${#out} chars: $out"
+      return 1
+    }
+  done
+}
+
+@test "the header fits at every terminal width the layout picks" {
+  local width pct avail out
+  for width in 60 70 80 100 120 140 160 200 250; do
+    pct=$(_sysz_preview_pct "$width")
+    avail=$(_sysz_header_width "$width" "$pct")
+    out=$(_sysz_header "$avail")
+    [ "${#out}" -le "$avail" ] || {
+      echo "terminal $width, preview $pct%, room $avail, header ${#out}: $out"
+      return 1
+    }
+  done
+}
+
 @test "_sysz_sort handles units without an extension" {
   run bash -c "source '$SYSZ'; printf '[user] noextension\n' | _sysz_sort"
   [ "$status" -eq 0 ]

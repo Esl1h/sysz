@@ -1,4 +1,4 @@
-# [sysz](https://github.com/joehillen/sysz)
+# [sysz](https://github.com/Esl1h/sysz)
 
 A [fzf](https://github.com/junegunn/fzf) terminal UI for systemctl
 
@@ -26,11 +26,16 @@ VERSION: 1.4.3
 
 # Requirements
 
-- [fzf](https://github.com/junegunn/fzf) >= [0.27.1](https://github.com/junegunn/fzf/blob/master/CHANGELOG.md#0244)
+- [fzf](https://github.com/junegunn/fzf) >= [0.46.0](https://github.com/junegunn/fzf/blob/master/CHANGELOG.md#0460)
 - bash > 4.3 (released 2009)
 - awk
 
 # Installation
+
+This is a maintained fork of [joehillen/sysz](https://github.com/joehillen/sysz).
+The AUR and nixpkgs packages below are still built from the original
+repository and do not carry the changes made here yet. To get this fork,
+use the direct download or build from source.
 
 ## Arch Linux
 
@@ -53,20 +58,20 @@ nix-env -iA nixpkgs.sysz
 ## Using [`bin`](https://github.com/marcosnils/bin)
 
 ```
-bin install https://github.com/joehillen/sysz
+bin install https://github.com/Esl1h/sysz
 ```
 
 ## Direct Download
 
 ```sh
-wget -O ~/.bin/sysz https://github.com/joehillen/sysz/releases/latest/download/sysz
+wget -O ~/.bin/sysz https://raw.githubusercontent.com/Esl1h/sysz/master/sysz
 chmod +x ~/.bin/sysz
 ```
 
 ## From Source
 
 ```sh
-git clone https://github.com/joehillen/sysz.git
+git clone https://github.com/Esl1h/sysz.git
 cd sysz
 sudo make install # /usr/local/bin/sysz
 ```
@@ -96,13 +101,18 @@ OPTS:
 CMD:
   start                  systemctl start <unit>
   stop                   systemctl stop <unit>
-  r, restart             systemctl restart <unit>
-  s, stat, status        systemctl status <unit>
-  ed, edit               systemctl edit <unit>
+  r, re, restart         systemctl restart <unit>
   reload                 systemctl reload <unit>
+  s, stat, status        systemctl status <unit>
   en, enable             systemctl enable <unit>
   d, dis, disable        systemctl disable <unit>
+  mask                   systemctl mask <unit>
+  unmask                 systemctl unmask <unit>
   c, cat                 systemctl cat <unit>
+  ed, edit               systemctl edit <unit>
+  show                   systemctl show <unit>
+  j, journal             journalctl -xe --unit <unit>
+  f, follow              journalctl -xef --unit <unit>
 
   If no command is given, one or more can be chosen interactively.
 
@@ -110,7 +120,7 @@ ARGS are passed to the systemctl command for each selected unit.
 
 Keybindings:
   TAB           Toggle selection.
-  ctrl-v        'cat' the unit in the preview window.
+  ctrl-v        Toggle 'cat' the unit in the preview window.
   ctrl-s        Select states to match. Selection is reset.
   ctrl-r        Run daemon-reload. Selection is reset.
   ctrl-p        History previous.
@@ -141,6 +151,10 @@ Examples with commands:
 ```
 
 # Acknowledgements
+
+Originally written by [Joe Hillenbrand](https://github.com/joehillen). This
+fork picks up maintenance where [joehillen/sysz](https://github.com/joehillen/sysz)
+left off.
 
 Inspired by [fuzzy-sys](https://github.com/NullSense/fuzzy-sys) by [NullSense](https://github.com/NullSense/)
 

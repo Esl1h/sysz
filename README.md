@@ -2,43 +2,45 @@
 
 A [fzf](https://github.com/junegunn/fzf) terminal UI for systemctl
 
-<a href="https://console.dev" title="Visit Console - the best tools for developers"><img src="https://console.dev/img/badges/1.0/svg/console-badge-logo-dark.svg" alt="Console - Developer Tool of the Week" /></a>
-
-# Demo
-
-[![asciicast](https://asciinema.org/a/BLsJz73uF7DdQj7FVGqLPhqCa.svg)](https://asciinema.org/a/BLsJz73uF7DdQj7FVGqLPhqCa)
+VERSION: 1.4.3
 
 # Features
 
-VERSION: 1.4.3
-
-- See and filter both system and user units simultaneously.
-- Supports all unit types.
-- Opens right away: loaded units are shown first and the rest stream in.
-- Keys are listed in the header, and the layout adapts to the terminal
-  width so nothing is cut off over a narrow ssh session.
-- Units ordered by service, timer, socket, and the rest.
-- Runs `sudo` automatically and only if necessary.
-- Filter units by state using `ctrl-s` or the `--state` option.
-- Run `daemon-reload` with `ctrl-r`.
-- Has short versions of systemctl commands to reduce typing.
-- Runs status after other commands (start, stop, restart, etc).
-- Select multiple units, states, and commands using `TAB`.
-- Only prompts commands based on current state
-  (e.g. show "start" only if the unit is inactive).
+- System and user units in one list, searchable together.
+- Opens without waiting: the loaded units appear first and the rest stream
+  in behind them.
+- The keys that matter are in the header, and the split between the list
+  and the preview follows the terminal width, so a narrow ssh session is
+  not left with unreadable unit names.
+- Units are coloured by state and ordered by type: services, then timers,
+  then sockets, then the rest.
+- Only offers the commands that make sense for the unit in front of you,
+  so `start` does not show for something already running.
+- Runs `status` after anything that changes a unit, so you see the result.
+- Preview shows `status`, or `cat` the unit file with `ctrl-v`.
+- Reads the journal for a unit, following it if you want.
+- Filters by state with `ctrl-s` or `--state`, and runs `daemon-reload`
+  with `ctrl-r`.
+- Takes several units, states or commands at once with `TAB`.
+- Calls `sudo` only when the unit actually requires it.
+- Short aliases for the systemctl commands, to type less.
 
 # Requirements
 
+- systemd, for `systemctl` and `journalctl`
 - [fzf](https://github.com/junegunn/fzf) >= [0.46.0](https://github.com/junegunn/fzf/blob/master/CHANGELOG.md#0460)
-- bash > 4.3 (released 2009)
-- awk
+- bash >= 4.3
+- awk, plus the usual `sed`, `sort`, `grep`, `cut` and `stty`
 
 # Installation
 
-This is a maintained fork of [joehillen/sysz](https://github.com/joehillen/sysz).
-The AUR and nixpkgs packages below are still built from the original
-repository and do not carry the changes made here yet. To get this fork,
-use the install script, the direct download, or build from source.
+sysz is a single bash script, so installing it means putting one file
+somewhere on your `PATH`.
+
+There is no distribution package for this fork. The `sysz` in the AUR and
+in nixpkgs is built from [joehillen/sysz](https://github.com/joehillen/sysz),
+which this forked from and which has not changed since 2022, so those
+packages do not carry anything described here.
 
 ## Install script
 
@@ -46,58 +48,43 @@ use the install script, the direct download, or build from source.
 curl -fsSL https://raw.githubusercontent.com/Esl1h/sysz/master/install.sh | bash
 ```
 
-Installs to `~/.local/bin` and tells you if that is not on your `PATH`.
-It checks bash, awk and fzf first, and refuses rather than installing
-something that cannot run.
+Installs to `~/.local/bin`, so it needs no privileges, and says so if that
+directory is not on your `PATH`. It checks bash, awk and fzf first and
+refuses rather than leaving you with something that will not start.
+
+It reads a few variables:
 
 ```sh
-# somewhere else, needs write access to the directory
+# install somewhere else
 SYSZ_INSTALL_DIR=/usr/local/bin curl -fsSL .../install.sh | sudo -E bash
 
-# a specific tag or branch
+# install a particular tag or branch
 SYSZ_REF=1.4.3 curl -fsSL .../install.sh | bash
 ```
 
-If you would rather read it before running it, it is
-[install.sh](install.sh) in this repository.
+Piping a script into a shell is worth being careful about. This one is
+[install.sh](install.sh) in this repository if you want to read it first.
 
-## Arch Linux
-
-```
-paru -S sysz
-```
-
-## NixOS
-
-```
-nix-env -iA nixos.sysz
-```
-
-## Using Nix
-
-```
-nix-env -iA nixpkgs.sysz
-```
-
-## Using [`bin`](https://github.com/marcosnils/bin)
-
-```
-bin install https://github.com/Esl1h/sysz
-```
-
-## Direct Download
+## Direct download
 
 ```sh
-wget -O ~/.bin/sysz https://raw.githubusercontent.com/Esl1h/sysz/master/sysz
-chmod +x ~/.bin/sysz
+mkdir -p ~/.local/bin
+curl -fsSL -o ~/.local/bin/sysz https://raw.githubusercontent.com/Esl1h/sysz/master/sysz
+chmod +x ~/.local/bin/sysz
 ```
 
-## From Source
+## From source
 
 ```sh
 git clone https://github.com/Esl1h/sysz.git
 cd sysz
 sudo make install # /usr/local/bin/sysz
+```
+
+Running the tests needs [bats](https://github.com/bats-core/bats-core):
+
+```sh
+make test
 ```
 
 # Usage

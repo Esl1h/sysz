@@ -1,6 +1,6 @@
 VERSION := $(shell cat VERSION)
 ARCHIVE := sysz-$(VERSION).tar.gz
-.PHONY: install clean release archive
+.PHONY: install clean release archive test
 .ONESHELL: aur-release
 
 sysz: VERSION
@@ -38,6 +38,9 @@ github-release: VERSION sysz CHANGELOG.md README.md
 
 release: clean sysz README.md github-release
 
+
+test:
+	bats test/
 
 install:
 	install -m755 sysz /usr/local/bin/

@@ -38,7 +38,28 @@ VERSION: 1.4.3
 This is a maintained fork of [joehillen/sysz](https://github.com/joehillen/sysz).
 The AUR and nixpkgs packages below are still built from the original
 repository and do not carry the changes made here yet. To get this fork,
-use the direct download or build from source.
+use the install script, the direct download, or build from source.
+
+## Install script
+
+```sh
+curl -fsSL https://raw.githubusercontent.com/Esl1h/sysz/master/install.sh | bash
+```
+
+Installs to `~/.local/bin` and tells you if that is not on your `PATH`.
+It checks bash, awk and fzf first, and refuses rather than installing
+something that cannot run.
+
+```sh
+# somewhere else, needs write access to the directory
+SYSZ_INSTALL_DIR=/usr/local/bin curl -fsSL .../install.sh | sudo -E bash
+
+# a specific tag or branch
+SYSZ_REF=1.4.3 curl -fsSL .../install.sh | bash
+```
+
+If you would rather read it before running it, it is
+[install.sh](install.sh) in this repository.
 
 ## Arch Linux
 

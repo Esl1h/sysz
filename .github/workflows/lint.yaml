@@ -10,12 +10,10 @@ jobs:
       - name: Run sh-checker
         uses: luizm/action-sh-checker@master
         env:
-          # Both predate this fork. SC2294 is the eval in _sysz_run, which is
-          # how every systemctl call is dispatched. SC2086 is "exit $CODE",
-          # where quoting the variable would change the exit code the program
-          # reports, because CODE is only assigned when the command fails.
-          # Neither is safe to touch before there is a test suite.
-          SHELLCHECK_OPTS: -e SC2294 -e SC2086
+          # SC2294 is the eval in _sysz_run, which is how every systemctl
+          # call is dispatched. It predates this fork and is not a drive-by
+          # fix.
+          SHELLCHECK_OPTS: -e SC2294
         with:
           # shfmt discovers the .bats files but cannot parse them: the
           # "@test name {" form is not shell syntax. The test workflow is

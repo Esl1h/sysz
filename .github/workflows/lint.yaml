@@ -17,4 +17,7 @@ jobs:
           # Neither is safe to touch before there is a test suite.
           SHELLCHECK_OPTS: -e SC2294 -e SC2086
         with:
-          sh_checker_exclude: "README.sh"
+          # shfmt discovers the .bats files but cannot parse them: the
+          # "@test name {" form is not shell syntax. The test workflow is
+          # what checks them.
+          sh_checker_exclude: "README.sh test/"

@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 #
-#   curl -fsSL https://raw.githubusercontent.com/Esl1h/sysz/master/install.sh | bash
+#   curl -fsSL https://raw.githubusercontent.com/Esl1h/sysz/main/install.sh | bash
 #
 # Environment:
 #   SYSZ_INSTALL_DIR  where to put the script  (default ~/.local/bin)
-#   SYSZ_REF          branch or tag to install (default master)
+#   SYSZ_REF          branch or tag to install (default main)
 #   SYSZ_REPO         owner/name to install from
 #   SYSZ_URL          fetch from here instead, whatever curl accepts
 #
@@ -15,7 +15,7 @@ set -euo pipefail
 
 _sysz_install() {
   local repo=${SYSZ_REPO:-Esl1h/sysz}
-  local ref=${SYSZ_REF:-master}
+  local ref=${SYSZ_REF:-main}
   local dir=${SYSZ_INSTALL_DIR:-${XDG_BIN_HOME:-$HOME/.local/bin}}
   local url=${SYSZ_URL:-"https://raw.githubusercontent.com/${repo}/${ref}/sysz"}
   local min_fzf=0.46.0

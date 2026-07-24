@@ -54,7 +54,7 @@ packages do not carry anything described here.
 ## Install script
 
 ${BLOCK}sh
-curl -fsSL https://raw.githubusercontent.com/Esl1h/sysz/master/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/Esl1h/sysz/main/install.sh | bash
 ${BLOCK}
 
 Installs to \`~/.local/bin\`, so it needs no privileges, and says so if that
@@ -78,7 +78,7 @@ Piping a script into a shell is worth being careful about. This one is
 
 ${BLOCK}sh
 mkdir -p ~/.local/bin
-curl -fsSL -o ~/.local/bin/sysz https://raw.githubusercontent.com/Esl1h/sysz/master/sysz
+curl -fsSL -o ~/.local/bin/sysz https://raw.githubusercontent.com/Esl1h/sysz/main/sysz
 chmod +x ~/.local/bin/sysz
 ${BLOCK}
 

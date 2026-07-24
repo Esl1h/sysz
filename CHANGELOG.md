@@ -14,7 +14,7 @@ includes the two pull requests that were left open there, credited below.
 ### Added
 
 - An install script, so getting sysz is one command:
-  `curl -fsSL https://raw.githubusercontent.com/Esl1h/sysz/master/install.sh | bash`
+  `curl -fsSL https://raw.githubusercontent.com/Esl1h/sysz/main/install.sh | bash`
 - `ctrl-v` toggles the `cat` preview instead of only switching to it,
   by [@greyHairChooseLife](https://github.com/greyHairChooseLife) (joehillen/sysz#31)
 - The header lists the keys worth knowing rather than only pointing at `?`,

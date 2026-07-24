@@ -24,12 +24,12 @@ PKGBUILD: VERSION $(ARCHIVE)
 
 aur-release: PKGBUILD
 	git commit -am 'Update PKGBUILD'
-	git push origin master
+	git push origin main
 	cp PKGBUILD ~/src/aur/sysz/PKGBUILD
 	cd ~/src/aur/sysz/
 	makepkg -ci
 	git commit -am "Release $(VERSION)"
-	git push origin master
+	git push origin main
 
 github-release: VERSION sysz CHANGELOG.md README.md
 	git commit -am 'Release $(VERSION)'

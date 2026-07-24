@@ -256,6 +256,12 @@ _sysz_list_units() {
 
 # main
 
+# Sourcing the script exposes the functions above without running the tool
+# or requiring fzf to be installed. The test suite relies on this.
+if [[ ${BASH_SOURCE[0]} != "$0" ]]; then
+  return 0
+fi
+
 # check fzf version
 # 0.46.0 is the first release that exports $FZF_PROMPT, which the ctrl-v
 # preview toggle reads to decide which direction to switch.

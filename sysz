@@ -457,7 +457,7 @@ while :; do
       --expect=ctrl-r,ctrl-s \
       --history="$SYSZ_HISTORY" \
       --prompt="Units: " \
-      --header '? for keybindings   [loading unit files...]' \
+      --header 'loading unit files...' \
       --bind 'load:change-header(? for keybindings)' \
       --bind "?:preview(echo '$(_sysz_keys)')" \
       --bind "ctrl-v:transform:[[ ! \$FZF_PROMPT =~ CAT ]] &&

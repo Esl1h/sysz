@@ -32,10 +32,12 @@ jobs:
       - name: Install fzf
         run: |
           set -euo pipefail
+          curl() { command curl --retry 3 --retry-delay 2 --retry-all-errors "$@"; }
           tag=$(curl -fsSL https://api.github.com/repos/junegunn/fzf/releases/latest |
             sed -n 's/.*"tag_name": *"\([^"]*\)".*/\1/p')
-          curl -fsSL "https://github.com/junegunn/fzf/releases/download/${tag}/fzf-${tag#v}-linux_amd64.tar.gz" |
-            sudo tar xz -C /usr/local/bin
+          curl -fsSL -o fzf.tar.gz "https://github.com/junegunn/fzf/releases/download/${tag}/fzf-${tag#v}-linux_amd64.tar.gz"
+          sudo tar xzf fzf.tar.gz -C /usr/local/bin
+          rm fzf.tar.gz
 
       - name: Run tests
         run: bats test/

@@ -21,6 +21,9 @@ jobs:
       - name: Install fzf ${{ matrix.fzf }}
         run: |
           set -euo pipefail
+          # A single 504 from github.com has already failed this job once,
+          # so every request here retries.
+          curl() { command curl --retry 3 --retry-delay 2 --retry-all-errors "$@"; }
           tag='${{ matrix.fzf }}'
           if [ "$tag" = latest ]; then
             tag=$(curl -fsSL https://api.github.com/repos/junegunn/fzf/releases/latest |
@@ -29,8 +32,9 @@ jobs:
           # Older tags carry no "v" prefix, newer ones do. The asset name
           # never does.
           version=${tag#v}
-          curl -fsSL "https://github.com/junegunn/fzf/releases/download/${tag}/fzf-${version}-linux_amd64.tar.gz" |
-            sudo tar xz -C /usr/local/bin
+          curl -fsSL -o fzf.tar.gz "https://github.com/junegunn/fzf/releases/download/${tag}/fzf-${version}-linux_amd64.tar.gz"
+          sudo tar xzf fzf.tar.gz -C /usr/local/bin
+          rm fzf.tar.gz
           fzf --version
 
       - name: Run tests
